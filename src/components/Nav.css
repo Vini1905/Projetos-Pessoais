@@ -1,0 +1,16 @@
+
+.navselec::after{
+    content:'';
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:0;
+    height:2px;
+    background-color:#F2A007;
+    transition: width 0.5s ease;
+
+}
+
+.navselec:hover::after{
+    width: 100%;
+}
