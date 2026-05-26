@@ -1,0 +1,85 @@
+name: Auto Release — Bump de versão e criação de PRs ao merge na develop
+
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release:
+    name: Bump de versão e criar Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Configurar git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump de versão com standard-version
+        run: npx standard-version --no-verify
+
+      - name: Obter nova versão
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Nova versão: $VERSION"
+
+      - name: Push mudanças de versão na develop
+        run: git push origin develop
+
+      - name: Verificar se release já existe
+        id: check
+        run: |
+          if git ls-remote --heads origin "release/${{ steps.version.outputs.version }}" | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Branch release/${{ steps.version.outputs.version }} já existe, pulando..."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Criar branch release a partir da main
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git checkout main
+          git pull origin main
+          git checkout -b "release/${{ steps.version.outputs.version }}"
+          git push origin "release/${{ steps.version.outputs.version }}"
+
+      - name: Criar PR develop → release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base "release/${{ steps.version.outputs.version }}" \
+            --head develop \
+            --title "release: v${{ steps.version.outputs.version }} — develop → release" \
+            --body "## Summary
+
+          PR automático criado pelo workflow de auto-release.
+
+          Versão bumped automaticamente para **v${{ steps.version.outputs.version }}** via \`standard-version\` (Conventional Commits).
+
+          ### Changelog
+          Consulte o \`CHANGELOG.md\` para detalhes das mudanças.
+
+          ### CI
+          Este PR aciona o workflow \`ci-release.yml\` que valida lint, testes com cobertura ≥90% e build.
+
+          ### Próximo passo
+          Após aprovação e merge, um novo PR será criado automaticamente de \`release/${{ steps.version.outputs.version }}\` → \`main\`."
