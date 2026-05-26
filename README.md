@@ -4,7 +4,7 @@ Site institucional desenvolvido com **React 19**, **Vite 8** e **Tailwind CSS 4*
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org/) v22+ (recomendado) ou v20+;
+- [Node.js](https://nodejs.org/) v22+ (recomendado) ou v20+.
 - npm v10+.
 
 ## Instalação
