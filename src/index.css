@@ -1,36 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap' );
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Grotesk:wght@300..700&family=Syncopate:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Syne:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap');
 
 @import "tailwindcss";
 
- @theme{
-    --font-shock:'Syne', sans-serif;
-    --font-caraguata:'Syncopate', sans-serif;
-    --font-marmita:'Orbitron', sans-serif;
-    --font-desc:'Montserrat', sans-serif;
-  }
-  
-@layer base{
+@theme {
+  --font-shock: 'Syne', sans-serif;
+  --font-caraguata: 'Syncopate', sans-serif;
+  --font-marmita: 'Orbitron', sans-serif;
+  --font-desc: 'Montserrat', sans-serif;
+}
 
-  *{
-    margin:0;
-    padding:0;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
   }
 }
 
-body{
-  color:#fff;
-  background-color:#4A5568;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
-  overflow:hidden;
+body {
+  color: #fff;
+  background-color: #4a5568;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  overflow: hidden;
 }
 
-html{
-  scroll-behavior:smooth;
+html {
+  scroll-behavior: smooth;
 }

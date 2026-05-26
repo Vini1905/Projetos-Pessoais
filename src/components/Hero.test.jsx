@@ -1,5 +1,5 @@
 import { render, screen, act, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import Hero from './Hero'
 
 describe('Hero', () => {
@@ -137,6 +137,18 @@ describe('Hero', () => {
 
     const items = container.querySelectorAll('.item')
     expect(items[2]).toHaveClass('active')
+  })
+
+  it('goes back without wrapping when not at first slide', () => {
+    const { container } = render(<Hero />)
+    const nextBtn = container.querySelector('#next')
+    const prevBtn = container.querySelector('#prev')
+
+    fireEvent.click(nextBtn)
+    fireEvent.click(prevBtn)
+
+    const items = container.querySelectorAll('.item')
+    expect(items[0]).toHaveClass('active')
   })
 
   it('wraps around to the first slide after the last', () => {
