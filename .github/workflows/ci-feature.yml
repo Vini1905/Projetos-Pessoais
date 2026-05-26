@@ -1,6 +1,9 @@
 name: CI - Feature → Develop
 
 on:
+  push:
+    branches:
+      - 'feature/**'
   pull_request:
     branches: [develop]
 

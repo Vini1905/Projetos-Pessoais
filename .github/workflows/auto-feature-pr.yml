@@ -1,0 +1,59 @@
+name: Auto PR — Criar PR feature → develop ao push
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-feature-pr:
+    name: Criar PR para develop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Obter nome da branch
+        id: branch
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          FEATURE_NAME="${BRANCH#feature/}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "feature_name=$FEATURE_NAME" >> "$GITHUB_OUTPUT"
+          echo "Branch: $BRANCH | Feature: $FEATURE_NAME"
+
+      - name: Verificar se PR já existe
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh pr list --base develop --head "${{ steps.branch.outputs.branch }}" --state open --json number --jq 'length')
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            PR_NUM=$(gh pr list --base develop --head "${{ steps.branch.outputs.branch }}" --state open --json number --jq '.[0].number')
+            echo "PR #${PR_NUM} já existe para esta feature, pulando criação..."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Criar PR feature → develop
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base develop \
+            --head "${{ steps.branch.outputs.branch }}" \
+            --title "feat: ${{ steps.branch.outputs.feature_name }}" \
+            --body "## Summary
+
+          PR automático criado ao push na branch \`${{ steps.branch.outputs.branch }}\`.
+
+          ### CI
+          O workflow \`ci-feature.yml\` valida automaticamente: lint, testes com cobertura ≥90% e build.
+
+          ### Fluxo
+          \`${{ steps.branch.outputs.branch }}\` → \`develop\` → \`release/x.x.x\` → \`main\`"
