@@ -1,16 +1,119 @@
-# React + Vite
+# DN Site
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site institucional desenvolvido com **React 19**, **Vite 8** e **Tailwind CSS 4**.
 
-Currently, two official plugins are available:
+## Pré-requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Node.js](https://nodejs.org/) v22+ (recomendado) ou v20+
+- npm v10+
 
-## React Compiler
+## Instalação
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+git clone https://github.com/Vini1905/Projetos-Pessoais.git
+cd Projetos-Pessoais
+npm install
+```
 
-## Expanding the ESLint configuration
+## Scripts disponíveis
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Inicia o servidor de desenvolvimento com HMR |
+| `npm run build` | Gera o build de produção na pasta `dist/` |
+| `npm run preview` | Serve o build de produção localmente |
+| `npm run lint` | Executa o ESLint em todo o projeto |
+| `npm run test` | Executa os testes unitários |
+| `npm run test:coverage` | Executa os testes com relatório de cobertura |
+
+## Subindo o projeto localmente
+
+```bash
+npm run dev
+```
+
+O servidor estará disponível em `http://localhost:5173` (porta padrão do Vite). Alterações nos arquivos são refletidas automaticamente no navegador via Hot Module Replacement (HMR).
+
+## Estrutura do projeto
+
+```
+├── public/                  # Arquivos estáticos (imagens, etc.)
+│   └── img/                 # Imagens do site
+├── src/
+│   ├── components/          # Componentes reutilizáveis
+│   │   ├── Hero.jsx         # Carrossel principal com slides
+│   │   ├── Hero.css         # Estilos do carrossel
+│   │   ├── Hero.test.jsx    # Testes do Hero
+│   │   ├── Logo.jsx         # Componente de logo
+│   │   ├── Logo.test.jsx    # Testes do Logo
+│   │   ├── NavBar.jsx       # Barra de navegação
+│   │   ├── NavBar.test.jsx  # Testes do NavBar
+│   │   └── Nav.css          # Estilos da navegação
+│   ├── pages/
+│   │   └── Home/
+│   │       ├── index.jsx    # Página principal
+│   │       ├── Home.test.jsx# Testes da Home
+│   │       └── style.css    # Estilos da página
+│   ├── main.jsx             # Entry point da aplicação
+│   ├── main.test.jsx        # Testes do entry point
+│   ├── index.css            # Estilos globais (Tailwind + fontes)
+│   └── setupTests.js        # Configuração dos testes (jest-dom)
+├── vite.config.js           # Configuração do Vite + Vitest
+├── eslint.config.js         # Configuração do ESLint
+├── package.json
+└── index.html               # HTML base
+```
+
+## Testes
+
+O projeto utiliza [Vitest](https://vitest.dev/) com [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) e [jsdom](https://github.com/jsdom/jsdom).
+
+### Rodando os testes
+
+```bash
+# Executar todos os testes
+npm run test
+
+# Executar com relatório de cobertura
+npm run test:coverage
+
+# Executar em modo watch (útil durante desenvolvimento)
+npx vitest
+```
+
+### Cobertura atual
+
+- **Statements:** 100%
+- **Functions:** 100%
+- **Lines:** 100%
+- **Branches:** 90%
+
+### Convenções para testes
+
+- Arquivos de teste ficam junto ao componente: `Componente.test.jsx`
+- Utilizar `describe` para agrupar testes por componente
+- Utilizar `screen` e queries do Testing Library para selecionar elementos
+- Para interações (click, etc.), usar `fireEvent` do Testing Library
+
+## Stack tecnológica
+
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| [React](https://react.dev/) | 19.x | Biblioteca de UI |
+| [Vite](https://vite.dev/) | 8.x | Build tool e dev server |
+| [Tailwind CSS](https://tailwindcss.com/) | 4.x | Framework de estilos utilitários |
+| [Vitest](https://vitest.dev/) | 4.x | Framework de testes |
+| [React Testing Library](https://testing-library.com/) | 16.x | Utilitários de teste para React |
+| [ESLint](https://eslint.org/) | 10.x | Linter de código |
+
+## Build de produção
+
+```bash
+npm run build
+```
+
+Os arquivos otimizados serão gerados na pasta `dist/`. Para visualizar localmente:
+
+```bash
+npm run preview
+```
