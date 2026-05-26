@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Variáveis de ambiente (manter .env.example versionado)
+.env
+.env.development
+.env.production
+.env.local
+.env.*.local
+
 # Testes e cobertura
 coverage/
 *.lcov
