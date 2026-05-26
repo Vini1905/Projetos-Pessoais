@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { render, screen, act, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Hero from './Hero'
 
 describe('Hero', () => {
@@ -41,24 +41,27 @@ describe('Hero', () => {
   it('renders the Marmita product card', () => {
     render(<Hero />)
     expect(screen.getByAltText('Marmita')).toBeInTheDocument()
-    expect(screen.getByText('Marmita')).toBeInTheDocument()
+    expect(screen.getByText(/Marmitas/)).toBeInTheDocument()
   })
 
   it('renders the Marmita image with correct src', () => {
     render(<Hero />)
     const marmitaImg = screen.getByAltText('Marmita')
-    expect(marmitaImg).toHaveAttribute('src', '/img/Caraguata.JPG')
+    expect(marmitaImg).toHaveAttribute('src', '/img/Marmita.jpg')
   })
 
-  it('renders Saiba Mais button', () => {
+  it('renders Saiba Mais buttons for each card', () => {
     render(<Hero />)
-    expect(screen.getByText('Saiba Mais!')).toBeInTheDocument()
+    const buttons = screen.getAllByText('Saiba Mais!')
+    expect(buttons).toHaveLength(3)
   })
 
-  it('renders the Saiba Mais button with correct classes', () => {
+  it('renders the Saiba Mais buttons with correct classes', () => {
     render(<Hero />)
-    const btn = screen.getByText('Saiba Mais!')
-    expect(btn).toHaveClass('btn', 'cadastro')
+    const buttons = screen.getAllByText('Saiba Mais!')
+    buttons.forEach((btn) => {
+      expect(btn).toHaveClass('btn', 'cadastro')
+    })
   })
 
   it('renders three list items', () => {
@@ -113,5 +116,79 @@ describe('Hero', () => {
     const { container } = render(<Hero />)
     const indicators = container.querySelector('.indicators')
     expect(indicators).toBeInTheDocument()
+  })
+
+  it('advances to the next slide when clicking the next button', () => {
+    const { container } = render(<Hero />)
+    const nextBtn = container.querySelector('#next')
+
+    fireEvent.click(nextBtn)
+
+    const items = container.querySelectorAll('.item')
+    expect(items[0]).not.toHaveClass('active')
+    expect(items[1]).toHaveClass('active')
+  })
+
+  it('goes to the previous slide when clicking the prev button', () => {
+    const { container } = render(<Hero />)
+    const prevBtn = container.querySelector('#prev')
+
+    fireEvent.click(prevBtn)
+
+    const items = container.querySelectorAll('.item')
+    expect(items[2]).toHaveClass('active')
+  })
+
+  it('wraps around to the first slide after the last', () => {
+    const { container } = render(<Hero />)
+    const nextBtn = container.querySelector('#next')
+
+    fireEvent.click(nextBtn)
+    fireEvent.click(nextBtn)
+    fireEvent.click(nextBtn)
+
+    const items = container.querySelectorAll('.item')
+    expect(items[0]).toHaveClass('active')
+  })
+
+  it('auto-advances the slide after 5 seconds', () => {
+    vi.useFakeTimers()
+    const { container } = render(<Hero />)
+
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+
+    const items = container.querySelectorAll('.item')
+    expect(items[1]).toHaveClass('active')
+    vi.useRealTimers()
+  })
+
+  it('changes active dot when clicking a dot indicator', () => {
+    const { container } = render(<Hero />)
+    const dots = container.querySelectorAll('.dot')
+
+    fireEvent.click(dots[2])
+    expect(dots[2]).toHaveClass('active')
+    expect(dots[0]).not.toHaveClass('active')
+
+    fireEvent.click(dots[1])
+    expect(dots[1]).toHaveClass('active')
+    expect(dots[2]).not.toHaveClass('active')
+
+    fireEvent.click(dots[0])
+    expect(dots[0]).toHaveClass('active')
+    expect(dots[1]).not.toHaveClass('active')
+  })
+
+  it('syncs dot indicators with active slide on next click', () => {
+    const { container } = render(<Hero />)
+    const nextBtn = container.querySelector('#next')
+
+    fireEvent.click(nextBtn)
+
+    const dots = container.querySelectorAll('.dot')
+    expect(dots[1]).toHaveClass('active')
+    expect(dots[0]).not.toHaveClass('active')
   })
 })
