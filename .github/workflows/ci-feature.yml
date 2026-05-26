@@ -27,16 +27,22 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test:coverage
+      - name: Executar testes com cobertura
+        run: npm run test:coverage -- --reporter=verbose 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tee coverage-output.txt
       - name: Verificar cobertura mínima (90%)
         run: |
-          npm run test:coverage 2>&1 | tee coverage-output.txt
-          STATEMENTS=$(grep "Statements" coverage-output.txt | grep -oP '[\d.]+(?=%)')
-          if (( $(echo "$STATEMENTS < 90" | bc -l) )); then
-            echo "❌ Cobertura abaixo de 90%: ${STATEMENTS}%"
+          STATEMENTS=$(grep "Statements" coverage-output.txt | grep -oE '[0-9]+\.?[0-9]*' | head -1)
+          echo "Cobertura de Statements: ${STATEMENTS}%"
+          if [ -z "$STATEMENTS" ]; then
+            echo "Não foi possível extrair a cobertura do relatório"
             exit 1
           fi
-          echo "✅ Cobertura OK: ${STATEMENTS}%"
+          RESULT=$(echo "$STATEMENTS < 90" | bc -l)
+          if [ "$RESULT" = "1" ]; then
+            echo "Cobertura abaixo de 90%: ${STATEMENTS}%"
+            exit 1
+          fi
+          echo "Cobertura OK: ${STATEMENTS}%"
 
   build:
     name: Build
