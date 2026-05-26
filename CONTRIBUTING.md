@@ -36,10 +36,12 @@ npm run test:coverage
 npm run lint
 ```
 
-#### 3. Abrir PR: `feature/*` → `develop`
+#### 3. PR automático: `feature/*` → `develop` (automático)
 
-- Crie um Pull Request da sua branch `feature/*` para `develop`
-- O CI irá executar automaticamente: lint, testes com cobertura (≥90%) e build
+- Ao fazer push na branch `feature/*`, dois workflows são disparados automaticamente:
+  1. **CI (`ci-feature.yml`)**: executa lint, testes com cobertura (≥90%) e build
+  2. **Auto PR (`auto-feature-pr.yml`)**: cria o PR de `feature/*` → `develop` automaticamente
+- Se o PR já existir, novos pushes apenas re-executam o CI
 - Aguarde aprovação e merge
 
 #### 4. PR automático: `develop` → `release/x.x.x` (automático)
