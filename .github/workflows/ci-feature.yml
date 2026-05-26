@@ -28,21 +28,22 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Executar testes com cobertura
-        run: npm run test:coverage -- --reporter=verbose 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tee coverage-output.txt
+        run: npm run test:coverage 2>&1 | sed 's/\x1b\[[0-9;]*m//g' > coverage-output.txt; cat coverage-output.txt
       - name: Verificar cobertura mínima (90%)
         run: |
-          STATEMENTS=$(grep "Statements" coverage-output.txt | grep -oE '[0-9]+\.?[0-9]*' | head -1)
-          echo "Cobertura de Statements: ${STATEMENTS}%"
-          if [ -z "$STATEMENTS" ]; then
+          STMTS=$(grep "All files" coverage-output.txt | awk -F'|' '{gsub(/ /,"",$2); print $2}')
+          echo "Cobertura de Statements: ${STMTS}%"
+          if [ -z "$STMTS" ]; then
             echo "Não foi possível extrair a cobertura do relatório"
+            cat coverage-output.txt
             exit 1
           fi
-          RESULT=$(echo "$STATEMENTS < 90" | bc -l)
+          RESULT=$(echo "$STMTS < 90" | bc -l)
           if [ "$RESULT" = "1" ]; then
-            echo "Cobertura abaixo de 90%: ${STATEMENTS}%"
+            echo "Cobertura abaixo de 90%: ${STMTS}%"
             exit 1
           fi
-          echo "Cobertura OK: ${STATEMENTS}%"
+          echo "Cobertura OK: ${STMTS}%"
 
   build:
     name: Build
