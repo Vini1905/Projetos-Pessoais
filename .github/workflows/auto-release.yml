@@ -1,4 +1,4 @@
-name: Auto Release — Criar branch e PRs ao merge na develop
+name: Auto Release — Bump de versão e criação de PRs ao merge na develop
 
 on:
   push:
@@ -10,19 +10,37 @@ permissions:
 
 jobs:
   create-release:
-    name: Criar Release e PRs
+    name: Bump de versão e criar Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Obter versão do package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Configurar git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump de versão com standard-version
+        run: npx standard-version --no-verify
+
+      - name: Obter nova versão
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Versão detectada: $VERSION"
+          echo "Nova versão: $VERSION"
+
+      - name: Push mudanças de versão na develop
+        run: git push origin develop
 
       - name: Verificar se release já existe
         id: check
@@ -32,13 +50,13 @@ jobs:
             echo "Branch release/${{ steps.version.outputs.version }} já existe, pulando..."
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "Branch release/${{ steps.version.outputs.version }} não existe, criando..."
           fi
 
-      - name: Criar branch release
+      - name: Criar branch release a partir da main
         if: steps.check.outputs.exists == 'false'
         run: |
           git checkout main
+          git pull origin main
           git checkout -b "release/${{ steps.version.outputs.version }}"
           git push origin "release/${{ steps.version.outputs.version }}"
 
@@ -55,7 +73,10 @@ jobs:
 
           PR automático criado pelo workflow de auto-release.
 
-          Promove as mudanças da \`develop\` para \`release/${{ steps.version.outputs.version }}\`.
+          Versão bumped automaticamente para **v${{ steps.version.outputs.version }}** via \`standard-version\` (Conventional Commits).
+
+          ### Changelog
+          Consulte o \`CHANGELOG.md\` para detalhes das mudanças.
 
           ### CI
           Este PR aciona o workflow \`ci-release.yml\` que valida lint, testes com cobertura ≥90% e build.

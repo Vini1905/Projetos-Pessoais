@@ -1,0 +1,16 @@
+{
+  "types": [
+    { "type": "feat", "section": "Funcionalidades" },
+    { "type": "fix", "section": "Correções" },
+    { "type": "docs", "section": "Documentação" },
+    { "type": "chore", "hidden": true },
+    { "type": "style", "hidden": true },
+    { "type": "refactor", "section": "Refatorações" },
+    { "type": "perf", "section": "Performance" },
+    { "type": "test", "section": "Testes" },
+    { "type": "ci", "section": "CI/CD" }
+  ],
+  "skip": {
+    "tag": true
+  }
+}

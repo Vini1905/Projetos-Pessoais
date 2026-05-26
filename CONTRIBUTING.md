@@ -44,13 +44,18 @@ npm run lint
 
 #### 4. PR automático: `develop` → `release/x.x.x` (automático)
 
-- Ao mergear na `develop`, o workflow **auto-release** cria automaticamente:
-  - A branch `release/x.x.x` (baseada na versão do `package.json`)
-  - O PR de `develop` → `release/x.x.x`
+- Ao mergear na `develop`, o workflow **auto-release** executa automaticamente:
+  1. **Bump de versão** via `standard-version` (baseado nos Conventional Commits)
+  2. **Geração do CHANGELOG.md** com as mudanças
+  3. **Criação da branch** `release/x.x.x` a partir da `main`
+  4. **Abertura do PR** de `develop` → `release/x.x.x`
 - O CI (`ci-release.yml`) executa os mesmos checks automaticamente
 - Aguarde aprovação e merge
 
-> **Nota:** Para lançar uma nova versão, atualize o campo `version` no `package.json` antes de mergear na `develop`.
+> **Versionamento automático:** A versão é determinada pelos prefixos dos commits:
+> - `feat:` → bump **minor** (1.0.0 → 1.1.0)
+> - `fix:` → bump **patch** (1.0.0 → 1.0.1)
+> - `feat!:` ou `BREAKING CHANGE:` → bump **major** (1.0.0 → 2.0.0)
 
 #### 5. PR automático: `release/x.x.x` → `main` (automático)
 
