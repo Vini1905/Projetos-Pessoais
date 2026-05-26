@@ -42,17 +42,20 @@ npm run lint
 - O CI irá executar automaticamente: lint, testes com cobertura (≥90%) e build
 - Aguarde aprovação e merge
 
-#### 4. Abrir PR: `develop` → `release/x.x.x`
+#### 4. PR automático: `develop` → `release/x.x.x` (automático)
 
-- Após acumular features na `develop`, crie uma branch `release/x.x.x`
-- Abra um PR de `develop` para `release/x.x.x`
-- O CI irá executar os mesmos checks
+- Ao mergear na `develop`, o workflow **auto-release** cria automaticamente:
+  - A branch `release/x.x.x` (baseada na versão do `package.json`)
+  - O PR de `develop` → `release/x.x.x`
+- O CI (`ci-release.yml`) executa os mesmos checks automaticamente
 - Aguarde aprovação e merge
 
-#### 5. Abrir PR: `release/x.x.x` → `main`
+> **Nota:** Para lançar uma nova versão, atualize o campo `version` no `package.json` antes de mergear na `develop`.
 
-- Abra um PR da `release/x.x.x` para `main`
-- O CI executará lint, testes, cobertura e build de produção
+#### 5. PR automático: `release/x.x.x` → `main` (automático)
+
+- Ao mergear na `release/x.x.x`, o workflow **auto-main-pr** cria automaticamente o PR para `main`
+- O CI (`ci-main.yml`) executa lint, testes, cobertura e build de produção
 - O artefato de build será salvo automaticamente
 - Após aprovação e merge, o fluxo está concluído
 

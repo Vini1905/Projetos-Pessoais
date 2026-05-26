@@ -1,0 +1,60 @@
+name: Auto PR — Criar PR release → main ao merge na release
+
+on:
+  push:
+    branches:
+      - 'release/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-main-pr:
+    name: Criar PR para main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Obter versão da branch
+        id: version
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          VERSION="${BRANCH#release/}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "Versão: $VERSION | Branch: $BRANCH"
+
+      - name: Verificar se PR já existe
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh pr list --base main --head "${{ steps.version.outputs.branch }}" --state open --json number --jq 'length')
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "PR release → main já existe, pulando..."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Criar PR release → main
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.version.outputs.branch }}" \
+            --title "release: v${{ steps.version.outputs.version }} → main" \
+            --body "## Summary
+
+          PR automático criado pelo workflow de auto-release.
+
+          Promove a \`release/${{ steps.version.outputs.version }}\` para \`main\` (produção).
+
+          ### CI
+          Este PR aciona o workflow \`ci-main.yml\` que valida lint, testes com cobertura ≥90% e build de produção.
+
+          ### Fluxo
+          \`feature/* → develop → release/${{ steps.version.outputs.version }} → main\`"
