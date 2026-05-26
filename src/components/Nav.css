@@ -14,3 +14,8 @@
 .navselec:hover::after{
     width: 100%;
 }
+
+.navselec{
+    font-size:1.1rem;
+   color: #EBEDEF;
+}
